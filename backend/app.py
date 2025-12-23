@@ -2,10 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import os
+from services.auth import router as authRouter
 
 app = FastAPI()
 
-# CORS Config
+### Routes
+app.include_router(authRouter)
+###
+
+### CORS Config
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # frontend dev
@@ -13,6 +18,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+###
 
 MODEL_PATH = "model/model.pkl"
 model = None
