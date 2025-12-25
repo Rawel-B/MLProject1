@@ -1,7 +1,6 @@
 
 backend/venv/
 backend/__pycache__/
-backend/model/*.pkl
 *.pyc
 
 frontend/node_modules/
