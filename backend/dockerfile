@@ -1,14 +1,12 @@
 FROM python:3.11-slim
-
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
 
+RUN pip install fastapi uvicorn[standard] joblib scikit-learn pandas
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend ./backend
-
-RUN touch backend/__init__.py
-
-CMD ["sh", "-c", "python -m uvicorn backend.app:app --host 0.0.0.0 --port $PORT"]
+COPY . .
+CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
