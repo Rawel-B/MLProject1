@@ -50,7 +50,13 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"status": "ok"}
-
+@app.get("/status")
+def getStatus():
+    return {
+        "model_loaded": model is not None,
+        "model_path_exists": os.path.exists(modelPATH),
+        "environment_port": os.environ.get("PORT", "Not Set")
+    }
 @app.post("/predict")
 def predict(features: list[float]):
     if model is None:
