@@ -6,6 +6,7 @@ from services.authService import router as authRouter
 from services.userService import router as userRouter
 from services.predictService import router as predictRouter
 from services.predictService import trainModel
+import threading
 
 app = FastAPI()
 
@@ -13,6 +14,10 @@ modelPATH = "model/financialknowledge.pkl"
 model = None 
 
 @app.on_event("startup")
+async def startup_event():
+    thread = threading.Thread(target=init_ml_model) # Opens Another Thread For Training
+    thread.start()
+    
 def init_ml_model():
     global model
     
