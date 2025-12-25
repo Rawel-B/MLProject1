@@ -35,7 +35,7 @@ app.include_router(predictRouter)
 ### CORS Config
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # frontend dev
+    allow_origins = ["https://main-frontend-508281375904.europe-west1.run.app"], # Live Server     #allow_origins=["http://localhost:3000"],  # Frontend Dev
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
