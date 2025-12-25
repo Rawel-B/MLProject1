@@ -3,7 +3,7 @@
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
-![React](https://img.shields.io/badge/react-%2320232b.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![Next.js](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 
 ## 🌟 Overview
 Wealth.AI is a full-stack financial health platform that uses a **Random Forest Regressor** to predict user efficiency scores. It analyzes savings, debt, and income patterns to provide actionable growth recommendations.
