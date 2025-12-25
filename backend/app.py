@@ -7,6 +7,7 @@ from services.userService import router as userRouter
 from services.predictService import router as predictRouter
 from services.predictService import trainModel
 import threading
+import uvicorn
 
 app = FastAPI()
 
@@ -64,3 +65,6 @@ def predict(features: list[float]):
 
     prediction = model.predict([features])
     return {"prediction": prediction.tolist()}
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
