@@ -1,21 +1,37 @@
 from passlib.context import CryptContext
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from jose import jwt
 from datetime import datetime, timedelta
 from database import users 
+from fastapi.security import OAuth2PasswordBearer
 
 #region Properties
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 router = APIRouter(prefix="/auth")
 SECRET = "supersecret"
 loginAlgorithm = "HS256"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 #endregion
 
 #region Main
-def hash_password(password: str):
+def hashPassword(password: str):
     return pwd_context.hash(password)
-def verify_password(password, hashed):
+def verifyPassword(password, hashed):
     return pwd_context.verify(password, hashed)
+def getCurrentUserBySession(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET, algorithms=[loginAlgorithm])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token expired or invalid")
+    user = users.find_one({"email": email})
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    user["_id"] = str(user["_id"])
+    del user["password"]
+    return user
 @router.post("/register")
 def register(data: dict):
     if users.find_one({"email": data["email"]}):
@@ -27,7 +43,7 @@ def register(data: dict):
     new_user = {
         "name": data.get("name"),
         "email": data["email"],
-        "password": hash_password(data["password"]), # Hashed
+        "password": hashPassword(data["password"]), # Hashed
         "created_at": datetime.utcnow()
     }
     
@@ -43,14 +59,14 @@ def register(data: dict):
 def login(data: dict):
     user = users.find_one({"email": data["email"]})
     
-    if not user or not verify_password(data["password"], user["password"]):
+    if not user or not verifyPassword(data["password"], user["password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
 
     token = jwt.encode(
-        {"sub": user["email"], "exp": datetime.utcnow() + timedelta(hours=1)}, 
+        {"sub": user["email"], "exp": datetime.utcnow() + timedelta(hours=24)}, 
         SECRET, 
         algorithm=loginAlgorithm
     )

@@ -2,12 +2,34 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import os
-from services.auth import router as authRouter
+from services.authService import router as authRouter
+from services.userService import router as userRouter
+from services.predictService import router as predictRouter
+from services.predictService import trainModel
 
 app = FastAPI()
 
+modelPATH = "model/financialknowledge.pkl"
+model = None 
+
+@app.on_event("startup")
+def init_ml_model():
+    global model
+    
+    os.makedirs(os.path.dirname(modelPATH), exist_ok=True)
+
+    if os.path.exists(modelPATH):
+        print(f"Stored knowledge found at {modelPATH}, loading pkl file....")
+        model = joblib.load(modelPATH)
+    else:
+        print("No knowledge file detected. Starting training sequence....")
+        model = trainModel() # Dumped
+        print("Model training complete....")
+
 ### Routes
 app.include_router(authRouter)
+app.include_router(userRouter)
+app.include_router(predictRouter)
 ###
 
 ### CORS Config
@@ -19,15 +41,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 ###
-
-MODEL_PATH = "model/model.pkl"
-model = None
-
-@app.on_event("startup")
-def load_model():
-    global model
-    if os.path.exists(MODEL_PATH):
-        model = joblib.load(MODEL_PATH)
 
 @app.get("/")
 def root():
